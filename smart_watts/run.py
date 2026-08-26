@@ -11,7 +11,10 @@
 # En producción:
 #     gunicorn -w 4 -b 0.0.0.0:5000 'run:app'
 # ===============================================
+import eventlet
+eventlet.monkey_patch()
 
+from smart_watts import create_app
 import os
 import sys
 from pathlib import Path
