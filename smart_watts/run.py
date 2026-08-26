@@ -14,7 +14,9 @@
 import eventlet
 eventlet.monkey_patch()
 
-from . import create_app
+from app import create_app
+# o si tenés __init__.py: from . import create_app
+# probá primero con "from app import create_app"
 
 app = create_app()
 
