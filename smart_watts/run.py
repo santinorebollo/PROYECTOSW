@@ -14,10 +14,9 @@
 import eventlet
 eventlet.monkey_patch()
 
-from __init__ import create_app
+from smart_watts import create_app
 
 app = create_app()
 
 if __name__ == "__main__":
     app.run()
-
