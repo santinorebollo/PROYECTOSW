@@ -14,7 +14,7 @@
 import eventlet
 eventlet.monkey_patch()
 
-from smart_watts import create_app
+from . import create_app
 
 app = create_app()
 
