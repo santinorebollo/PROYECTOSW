@@ -1,0 +1,161 @@
+{# =============================================== #}
+{# app/templates/auth/login.html #}
+{# =============================================== #}
+{# Página de Login - diseño split-screen SaaS #}
+{# =============================================== #}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - {{ APP_NAME }}</title>
+
+    {# Bootstrap #}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    {# Font Awesome #}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    {# CSS de autenticación #}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+
+    <link rel="icon" href="{{ url_for('static', filename='img/logo.png') }}">
+</head>
+<body class="auth-body">
+    <div class="auth-wrapper">
+        {# ==================== PANEL DE MARCA ==================== #}
+        <div class="auth-brand">
+            <div class="auth-brand-content">
+                <div class="auth-logo-badge">
+                    <img src="{{ url_for('static', filename='img/logo.png') }}" alt="{{ APP_NAME }}">
+                </div>
+                <h1>{{ APP_NAME }}</h1>
+                <p class="tagline">Plataforma inteligente de monitoreo y gestión de consumo energético en tiempo real.</p>
+
+                <ul class="auth-feature-list">
+                    <li>
+                        <span class="icon"><i class="fas fa-bolt"></i></span>
+                        <span>Monitoreo de consumo en tiempo real</span>
+                    </li>
+                    <li>
+                        <span class="icon"><i class="fas fa-bell"></i></span>
+                        <span>Alertas y notificaciones inteligentes</span>
+                    </li>
+                    <li>
+                        <span class="icon"><i class="fas fa-chart-line"></i></span>
+                        <span>Reportes y analítica avanzada</span>
+                    </li>
+                    <li>
+                        <span class="icon"><i class="fas fa-wallet"></i></span>
+                        <span>Control de presupuestos energéticos</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        {# ==================== PANEL DE FORMULARIO ==================== #}
+        <div class="auth-form-side">
+            <div class="auth-form-card">
+                <div class="auth-form-mobile-logo">
+                    <span class="badge-dark">
+                        <img src="{{ url_for('static', filename='img/logo.png') }}" alt="{{ APP_NAME }}">
+                    </span>
+                </div>
+
+                <h2>Iniciar Sesión</h2>
+                <p class="subtitle">Ingresa tus credenciales para acceder a tu panel</p>
+
+                {# Mensajes de error/éxito #}
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{% if category == 'danger' %}danger{% else %}{{ category }}{% endif %} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                {# Formulario de login #}
+                <form method="POST" novalidate>
+                    {{ form.hidden_tag() }}
+
+                    {# Email #}
+                    <div class="mb-3">
+                        <label class="form-label">{{ form.email.label.text }}</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                            {{ form.email(class="form-control") }}
+                        </div>
+                        {% if form.email.errors %}
+                            <div class="form-text-error">
+                                {% for error in form.email.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    {# Contraseña #}
+                    <div class="mb-3">
+                        <label class="form-label">{{ form.password.label.text }}</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                            {{ form.password(class="form-control", id="password-field") }}
+                            <span class="input-group-text password-toggle" onclick="togglePassword('password-field', this)">
+                                <i class="fas fa-eye"></i>
+                            </span>
+                        </div>
+                        {% if form.password.errors %}
+                            <div class="form-text-error">
+                                {% for error in form.password.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    {# Recuérdame #}
+                    <div class="form-check mb-3">
+                        {{ form.recuerdarme(class="form-check-input") }}
+                        {{ form.recuerdarme.label(class="form-check-label") }}
+                    </div>
+
+                    {# Botón enviar #}
+                    {{ form.enviar(class="btn-auth") }}
+                </form>
+
+                {# Links adicionales #}
+                <div class="form-footer">
+                    <p class="mb-1">¿No tienes cuenta? <a href="{{ url_for('auth.registro') }}">Regístrate aquí</a></p>
+                    <p class="mb-0">¿Olvidaste tu contraseña? <a href="{{ url_for('auth.recuperar_contraseña') }}">Recuperarla</a></p>
+                </div>
+
+                {# Credenciales de demostración #}
+                <div class="auth-demo-box">
+                    <strong><i class="fas fa-circle-info"></i> Credenciales de demostración</strong><br>
+                    Admin: <code>admin@smartwatts.com</code> / <code>admin123</code><br>
+                    Usuario: <code>usuario@smartwatts.com</code> / <code>usuario123</code>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function togglePassword(fieldId, wrapper) {
+            const field = document.getElementById(fieldId);
+            const icon = wrapper.querySelector('i');
+            if (field.type === 'password') {
+                field.type = 'text';
+                icon.classList.replace('fa-eye', 'fa-eye-slash');
+            } else {
+                field.type = 'password';
+                icon.classList.replace('fa-eye-slash', 'fa-eye');
+            }
+        }
+    </script>
+</body>
+</html>

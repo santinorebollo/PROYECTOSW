@@ -1,0 +1,78 @@
+{# =============================================== #}
+{# app/templates/devices/crear.html #}
+{# =============================================== #}
+{# Página de Creación de Dispositivo #}
+{# =============================================== #}
+
+{% extends "base.html" %}
+
+{% block title %}Nuevo Dispositivo - {{ APP_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="h3"><i class="fas fa-plus-circle"></i> Nuevo Dispositivo</h1>
+            <p class="text-muted">Registra un nuevo medidor IoT en el sistema</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <form method="POST" novalidate>
+                        {{ form.hidden_tag() }}
+
+                        <div class="mb-3">
+                            <label class="form-label">{{ form.nombre.label.text }}</label>
+                            {{ form.nombre(class="form-control") }}
+                            {% if form.nombre.errors %}
+                                <div class="text-danger mt-1">
+                                    {% for error in form.nombre.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">{{ form.ubicacion.label.text }}</label>
+                            {{ form.ubicacion(class="form-control") }}
+                            {% if form.ubicacion.errors %}
+                                <div class="text-danger mt-1">
+                                    {% for error in form.ubicacion.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">{{ form.firmware.label.text }}</label>
+                            {{ form.firmware(class="form-control") }}
+                            {% if form.firmware.errors %}
+                                <div class="text-danger mt-1">
+                                    {% for error in form.firmware.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i>
+                            Al crear el dispositivo se generará un <strong>token de API</strong> único
+                            que deberás configurar en el firmware del medidor para que pueda
+                            enviar lecturas a <code>/api/v1/lecturas</code>.
+                        </div>
+
+                        {{ form.enviar(class="btn btn-success") }}
+                        <a href="{{ url_for('devices.listado') }}" class="btn btn-outline-secondary">Cancelar</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,121 @@
+{# =============================================== #}
+{# app/templates/reports/mensual.html #}
+{# =============================================== #}
+{# Reporte Mensual de Consumo #}
+{# =============================================== #}
+
+{% extends "base.html" %}
+
+{% block title %}Reporte Mensual - {{ APP_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="h3"><i class="fas fa-calendar-alt"></i> Reporte Mensual</h1>
+            <p class="text-muted">Consumo del mes actual y comparativa con tu presupuesto</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{{ url_for('reports.exportar', tipo='mensual') }}" class="btn btn-outline-warning">
+                <i class="fas fa-download"></i> Exportar CSV
+            </a>
+            <a href="{{ url_for('reports.listado') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left"></i> Volver
+            </a>
+        </div>
+    </div>
+
+    {# ==================== TARJETAS DE RESUMEN ==================== #}
+    <div class="row mb-4">
+        <div class="col-md-4 mb-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <p class="text-muted mb-1">Consumo del Mes</p>
+                    <h3 class="mb-0">{{ consumo_mes }} kWh</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <p class="text-muted mb-1">Costo del Mes</p>
+                    <h3 class="mb-0">${{ "%.2f"|format(costo_mes) }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <p class="text-muted mb-1">Presupuesto Mensual</p>
+                    <h3 class="mb-0">${{ "%.2f"|format(presupuesto.presupuesto_mensual) }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# ==================== PROGRESO DE PRESUPUESTO ==================== #}
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-light">
+            <h5 class="card-title mb-0">Uso del Presupuesto</h5>
+        </div>
+        <div class="card-body">
+            <div class="d-flex justify-content-between mb-1">
+                <span>Progreso</span>
+                <strong>{{ porcentaje }}%</strong>
+            </div>
+            <div class="progress" style="height: 25px;">
+                <div class="progress-bar {% if porcentaje >= 100 %}bg-danger{% elif porcentaje >= 85 %}bg-warning{% else %}bg-success{% endif %}"
+                     role="progressbar"
+                     style="width: {{ [porcentaje, 100] | min }}%;"
+                     aria-valuenow="{{ porcentaje }}" aria-valuemin="0" aria-valuemax="100">
+                    {{ porcentaje }}%
+                </div>
+            </div>
+            {% if porcentaje >= 100 %}
+                <small class="text-danger d-block mt-2"><i class="fas fa-exclamation-circle"></i> Has superado tu presupuesto mensual</small>
+            {% elif porcentaje >= 85 %}
+                <small class="text-warning d-block mt-2"><i class="fas fa-exclamation-triangle"></i> Estás cerca de alcanzar tu presupuesto mensual</small>
+            {% endif %}
+            <a href="{{ url_for('settings.presupuesto') }}" class="btn btn-sm btn-outline-primary mt-3">
+                <i class="fas fa-wallet"></i> Configurar Presupuesto
+            </a>
+        </div>
+    </div>
+
+    {# ==================== TOP DISPOSITIVOS ==================== #}
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-light">
+            <h5 class="card-title mb-0">Dispositivos con Mayor Consumo este Mes</h5>
+        </div>
+        <div class="card-body">
+            {% if top_dispositivos %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Dispositivo</th>
+                                <th>Consumo (kWh)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for nombre, total in top_dispositivos %}
+                                <tr>
+                                    <td>{{ loop.index }}</td>
+                                    <td><i class="fas fa-microchip"></i> {{ nombre }}</td>
+                                    <td>{{ total | round(2) }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info mb-0" role="alert">
+                    <i class="fas fa-info-circle"></i>
+                    Aún no hay lecturas registradas este mes
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

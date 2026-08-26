@@ -1,0 +1,89 @@
+{# =============================================== #}
+{# app/templates/devices/editar.html #}
+{# =============================================== #}
+{# Página de Edición de Dispositivo #}
+{# =============================================== #}
+
+{% extends "base.html" %}
+
+{% block title %}Editar {{ dispositivo.nombre }} - {{ APP_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="h3"><i class="fas fa-edit"></i> Editar Dispositivo</h1>
+            <p class="text-muted">{{ dispositivo.nombre }}</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <form method="POST" novalidate>
+                        {{ form.hidden_tag() }}
+
+                        <div class="mb-3">
+                            <label class="form-label">{{ form.nombre.label.text }}</label>
+                            {{ form.nombre(class="form-control") }}
+                            {% if form.nombre.errors %}
+                                <div class="text-danger mt-1">
+                                    {% for error in form.nombre.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">{{ form.ubicacion.label.text }}</label>
+                            {{ form.ubicacion(class="form-control") }}
+                            {% if form.ubicacion.errors %}
+                                <div class="text-danger mt-1">
+                                    {% for error in form.ubicacion.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">{{ form.estado.label.text }}</label>
+                            {{ form.estado(class="form-select") }}
+                            {% if form.estado.errors %}
+                                <div class="text-danger mt-1">
+                                    {% for error in form.estado.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">{{ form.firmware.label.text }}</label>
+                            {{ form.firmware(class="form-control") }}
+                            {% if form.firmware.errors %}
+                                <div class="text-danger mt-1">
+                                    {% for error in form.firmware.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Token de API</label>
+                            <input type="text" class="form-control" value="{{ dispositivo.token_api }}" readonly>
+                            <small class="text-muted">El token de API no puede modificarse</small>
+                        </div>
+
+                        {{ form.enviar(class="btn btn-primary") }}
+                        <a href="{{ url_for('devices.ver', dispositivo_id=dispositivo.id) }}" class="btn btn-outline-secondary">Cancelar</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

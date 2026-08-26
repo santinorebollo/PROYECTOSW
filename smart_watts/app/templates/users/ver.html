@@ -1,0 +1,197 @@
+{# =============================================== #}
+{# app/templates/users/ver.html #}
+{# =============================================== #}
+{# Página de Detalle de Usuario #}
+{# =============================================== #}
+
+{% extends "base.html" %}
+
+{% block title %}{{ usuario.nombre }} - {{ APP_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="h3"><i class="fas fa-user"></i> {{ usuario.nombre }}</h1>
+            <p class="text-muted">{{ usuario.email }}</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{{ url_for('users.editar', usuario_id=usuario.id) }}" class="btn btn-outline-warning">
+                <i class="fas fa-edit"></i> Editar
+            </a>
+            {% if usuario.id != current_user.id %}
+                {% if usuario.activo %}
+                    <button onclick="confirmarAccion({{ usuario.id }}, 'desactivar', '¿Desactivar a {{ usuario.nombre }}?')"
+                            class="btn btn-outline-secondary">
+                        <i class="fas fa-user-slash"></i> Desactivar
+                    </button>
+                {% else %}
+                    <button onclick="confirmarAccion({{ usuario.id }}, 'activar', '¿Activar a {{ usuario.nombre }}?')"
+                            class="btn btn-outline-success">
+                        <i class="fas fa-user-check"></i> Activar
+                    </button>
+                {% endif %}
+                <button onclick="confirmarAccion({{ usuario.id }}, 'eliminar', '¿Eliminar permanentemente a {{ usuario.nombre }}? Esta acción no se puede deshacer.')"
+                        class="btn btn-outline-danger">
+                    <i class="fas fa-trash"></i> Eliminar
+                </button>
+            {% endif %}
+            <a href="{{ url_for('users.listado') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left"></i> Volver
+            </a>
+        </div>
+    </div>
+
+    {# ==================== TARJETAS DE ESTADO ==================== #}
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <p class="text-muted mb-1">Rol</p>
+                    <h4 class="mb-0">
+                        <span class="badge bg-{% if usuario.rol == 'admin' %}primary{% else %}secondary{% endif %}">
+                            {{ 'Administrador' if usuario.rol == 'admin' else 'Usuario' }}
+                        </span>
+                    </h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <p class="text-muted mb-1">Estado</p>
+                    <h4 class="mb-0">
+                        <span class="badge bg-{% if usuario.activo %}success{% else %}danger{% endif %}">
+                            {{ 'Activo' if usuario.activo else 'Inactivo' }}
+                        </span>
+                    </h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <p class="text-muted mb-1">Dispositivos</p>
+                    <h4 class="mb-0">{{ dispositivos_count }}</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <p class="text-muted mb-1">Presupuesto Mensual</p>
+                    <h4 class="mb-0">
+                        {% if presupuesto %}
+                            ${{ "%.2f"|format(presupuesto.presupuesto_mensual) }}
+                        {% else %}
+                            <span class="text-muted">Sin definir</span>
+                        {% endif %}
+                    </h4>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        {# ==================== INFORMACIÓN DE LA CUENTA ==================== #}
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-light">
+                    <h5 class="card-title mb-0">Información de la Cuenta</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm mb-0">
+                        <tbody>
+                            <tr>
+                                <th>Nombre</th>
+                                <td>{{ usuario.nombre }}</td>
+                            </tr>
+                            <tr>
+                                <th>Correo Electrónico</th>
+                                <td>{{ usuario.email }}</td>
+                            </tr>
+                            <tr>
+                                <th>Rol</th>
+                                <td>{{ 'Administrador' if usuario.rol == 'admin' else 'Usuario Regular' }}</td>
+                            </tr>
+                            <tr>
+                                <th>Cuenta Creada</th>
+                                <td>{{ usuario.fecha_creacion.strftime('%d/%m/%Y %H:%M') }}</td>
+                            </tr>
+                            <tr>
+                                <th>Último Login</th>
+                                <td>
+                                    {% if usuario.ultima_login %}
+                                        {{ usuario.ultima_login.strftime('%d/%m/%Y %H:%M') }}
+                                    {% else %}
+                                        <span class="text-muted">Nunca ha iniciado sesión</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        {# ==================== DISPOSITIVOS DEL USUARIO ==================== #}
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-light">
+                    <h5 class="card-title mb-0">Dispositivos</h5>
+                </div>
+                <div class="card-body">
+                    {% if usuario.dispositivos.count() > 0 %}
+                        <div class="table-responsive">
+                            <table class="table table-hover table-sm mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Nombre</th>
+                                        <th>Ubicación</th>
+                                        <th>Estado</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for dispositivo in usuario.dispositivos %}
+                                        {% set estado = dispositivo.obtener_estado_conexion() %}
+                                        <tr>
+                                            <td>{{ dispositivo.nombre }}</td>
+                                            <td>{{ dispositivo.ubicacion or '-' }}</td>
+                                            <td>
+                                                <span class="badge bg-{% if estado == 'activo' %}success{% elif estado == 'inactivo' %}warning{% else %}danger{% endif %}">
+                                                    {{ estado.capitalize() }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <a href="{{ url_for('devices.ver', dispositivo_id=dispositivo.id) }}"
+                                                   class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted mb-0">Este usuario no tiene dispositivos registrados</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function confirmarAccion(usuarioId, accion, mensaje) {
+    if (confirm(mensaje)) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `/usuarios/${usuarioId}/${accion}`;
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+</script>
+{% endblock %}

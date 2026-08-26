@@ -1,0 +1,75 @@
+{# =============================================== #}
+{# app/templates/settings/tarifas.html #}
+{# =============================================== #}
+{# Página de Configuración de Tarifas Energéticas #}
+{# =============================================== #}
+
+{% extends "base.html" %}
+
+{% block title %}Tarifas - {{ APP_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="h3"><i class="fas fa-cog"></i> Tarifas Energéticas</h1>
+            <p class="text-muted">Configura los precios utilizados para calcular el costo del consumo</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <form method="POST" novalidate>
+                        {{ form.hidden_tag() }}
+
+                        <div class="mb-3">
+                            <label class="form-label">{{ form.precio_kwh.label.text }}</label>
+                            {{ form.precio_kwh(class="form-control") }}
+                            {% if form.precio_kwh.errors %}
+                                <div class="text-danger mt-1">
+                                    {% for error in form.precio_kwh.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">{{ form.impuestos.label.text }}</label>
+                            {{ form.impuestos(class="form-control") }}
+                            {% if form.impuestos.errors %}
+                                <div class="text-danger mt-1">
+                                    {% for error in form.impuestos.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">{{ form.cargos_fijos.label.text }}</label>
+                            {{ form.cargos_fijos(class="form-control") }}
+                            {% if form.cargos_fijos.errors %}
+                                <div class="text-danger mt-1">
+                                    {% for error in form.cargos_fijos.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i>
+                            Costo total = (Consumo &times; Precio kWh) &times; (1 + Impuestos / 100) + Cargos Fijos
+                        </div>
+
+                        {{ form.enviar(class="btn btn-success") }}
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

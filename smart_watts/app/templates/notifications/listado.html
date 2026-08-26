@@ -1,0 +1,224 @@
+{# =============================================== #}
+{# app/templates/notifications/listado.html #}
+{# =============================================== #}
+{# Centro de Notificaciones #}
+{# =============================================== #}
+
+{% extends "base.html" %}
+
+{% block title %}Notificaciones - {{ APP_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <h1 class="h3"><i class="fas fa-bell"></i> Notificaciones</h1>
+        </div>
+        <div class="col-md-6 text-end">
+            {% if no_leidas > 0 %}
+                <form method="POST" action="{{ url_for('notifications.marcar_todas_leidas') }}" class="d-inline">
+                    <button type="submit" class="btn btn-outline-primary">
+                        <i class="fas fa-check-double"></i> Marcar todas como leídas
+                    </button>
+                </form>
+            {% endif %}
+            {% if leidas > 0 %}
+                <button onclick="confirmarLimpiar()" class="btn btn-outline-danger">
+                    <i class="fas fa-broom"></i> Limpiar leídas
+                </button>
+            {% endif %}
+        </div>
+    </div>
+
+    {# ==================== TARJETAS DE RESUMEN ==================== #}
+    <div class="row mb-4">
+        <div class="col-md-4 mb-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <p class="text-muted mb-1">Total</p>
+                    <h4 class="mb-0">{{ total_notificaciones }}</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <p class="text-muted mb-1">No Leídas</p>
+                    <h4 class="mb-0 text-danger">{{ no_leidas }}</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <p class="text-muted mb-1">Leídas</p>
+                    <h4 class="mb-0 text-success">{{ leidas }}</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# ==================== FILTROS ==================== #}
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <form method="GET" class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label">Tipo</label>
+                    <select name="tipo" class="form-select">
+                        <option value="todas" {% if not filtro_tipo or filtro_tipo == 'todas' %}selected{% endif %}>Todos los tipos</option>
+                        <option value="consumo" {% if filtro_tipo == 'consumo' %}selected{% endif %}>Consumo</option>
+                        <option value="preventiva" {% if filtro_tipo == 'preventiva' %}selected{% endif %}>Preventiva</option>
+                        <option value="presupuesto" {% if filtro_tipo == 'presupuesto' %}selected{% endif %}>Presupuesto</option>
+                        <option value="dispositivo" {% if filtro_tipo == 'dispositivo' %}selected{% endif %}>Dispositivo</option>
+                        <option value="sistema" {% if filtro_tipo == 'sistema' %}selected{% endif %}>Sistema</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Estado</label>
+                    <select name="estado" class="form-select">
+                        <option value="" {% if not filtro_estado %}selected{% endif %}>Todos</option>
+                        <option value="no_leida" {% if filtro_estado == 'no_leida' %}selected{% endif %}>No leídas</option>
+                        <option value="leida" {% if filtro_estado == 'leida' %}selected{% endif %}>Leídas</option>
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-outline-primary w-100">
+                        <i class="fas fa-filter"></i> Filtrar
+                    </button>
+                </div>
+                {% if filtro_tipo or filtro_estado %}
+                    <div class="col-md-2 d-flex align-items-end">
+                        <a href="{{ url_for('notifications.listado') }}" class="btn btn-outline-secondary w-100">
+                            <i class="fas fa-times"></i> Limpiar
+                        </a>
+                    </div>
+                {% endif %}
+            </form>
+        </div>
+    </div>
+
+    {# ==================== LISTADO DE NOTIFICACIONES ==================== #}
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+            {% if notificaciones %}
+                <div class="list-group list-group-flush">
+                    {% for notificacion in notificaciones %}
+                        <div class="list-group-item d-flex justify-content-between align-items-start {% if not notificacion.leida %}list-group-item-light{% endif %}">
+                            <div class="d-flex">
+                                <div class="me-3">
+                                    {% if notificacion.tipo == 'consumo' %}
+                                        <i class="fas fa-bolt text-warning fa-lg"></i>
+                                    {% elif notificacion.tipo == 'preventiva' %}
+                                        <i class="fas fa-exclamation-triangle text-warning fa-lg"></i>
+                                    {% elif notificacion.tipo == 'presupuesto' %}
+                                        <i class="fas fa-wallet text-danger fa-lg"></i>
+                                    {% elif notificacion.tipo == 'dispositivo' %}
+                                        <i class="fas fa-microchip text-info fa-lg"></i>
+                                    {% else %}
+                                        <i class="fas fa-info-circle text-secondary fa-lg"></i>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <p class="mb-1 {% if not notificacion.leida %}fw-bold{% endif %}">
+                                        {{ notificacion.mensaje }}
+                                    </p>
+                                    <small class="text-muted">
+                                        <span class="badge bg-light text-dark">{{ notificacion.tipo.capitalize() }}</span>
+                                        {{ notificacion.fecha.strftime('%d/%m/%Y %H:%M') }}
+                                    </small>
+                                </div>
+                            </div>
+                            <div class="text-nowrap ms-2">
+                                {% if notificacion.leida %}
+                                    <form method="POST" action="{{ url_for('notifications.marcar_no_leida', notificacion_id=notificacion.id) }}" class="d-inline">
+                                        <button type="submit" class="btn btn-sm btn-outline-secondary" title="Marcar como no leída">
+                                            <i class="fas fa-envelope"></i>
+                                        </button>
+                                    </form>
+                                {% else %}
+                                    <form method="POST" action="{{ url_for('notifications.marcar_leida', notificacion_id=notificacion.id) }}" class="d-inline">
+                                        <button type="submit" class="btn btn-sm btn-outline-success" title="Marcar como leída">
+                                            <i class="fas fa-envelope-open"></i>
+                                        </button>
+                                    </form>
+                                {% endif %}
+                                <button onclick="confirmarEliminar({{ notificacion.id }})" class="btn btn-sm btn-outline-danger" title="Eliminar">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                {# Paginación #}
+                {% if paginacion.pages > 1 %}
+                    <nav aria-label="Page navigation" class="mt-4">
+                        <ul class="pagination">
+                            <li class="page-item {% if not paginacion.has_prev %}disabled{% endif %}">
+                                <a class="page-link"
+                                   href="{{ url_for('notifications.listado', pagina=1, tipo=filtro_tipo, estado=filtro_estado) }}">
+                                    Primera
+                                </a>
+                            </li>
+
+                            {% for page_num in paginacion.iter_pages() %}
+                                {% if page_num %}
+                                    {% if page_num == paginacion.page %}
+                                        <li class="page-item active">
+                                            <span class="page-link">{{ page_num }}</span>
+                                        </li>
+                                    {% else %}
+                                        <li class="page-item">
+                                            <a class="page-link"
+                                               href="{{ url_for('notifications.listado', pagina=page_num, tipo=filtro_tipo, estado=filtro_estado) }}">
+                                                {{ page_num }}
+                                            </a>
+                                        </li>
+                                    {% endif %}
+                                {% else %}
+                                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                                {% endif %}
+                            {% endfor %}
+
+                            <li class="page-item {% if not paginacion.has_next %}disabled{% endif %}">
+                                <a class="page-link"
+                                   href="{{ url_for('notifications.listado', pagina=paginacion.pages, tipo=filtro_tipo, estado=filtro_estado) }}">
+                                    Última
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                {% endif %}
+            {% else %}
+                <div class="alert alert-info mb-0" role="alert">
+                    <i class="fas fa-info-circle"></i>
+                    No tienes notificaciones
+                    {% if filtro_tipo or filtro_estado %}con los filtros seleccionados{% endif %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+function confirmarEliminar(notificacionId) {
+    if (confirm('¿Estás seguro de que deseas eliminar esta notificación?')) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `/notificaciones/${notificacionId}/eliminar`;
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+
+function confirmarLimpiar() {
+    if (confirm('¿Eliminar todas las notificaciones leídas?')) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/notificaciones/limpiar';
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+</script>
+{% endblock %}

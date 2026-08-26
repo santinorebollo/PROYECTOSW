@@ -1,0 +1,77 @@
+{# =============================================== #}
+{# app/templates/users/editar.html #}
+{# =============================================== #}
+{# Página de Edición de Usuario #}
+{# =============================================== #}
+
+{% extends "base.html" %}
+
+{% block title %}Editar {{ usuario.nombre }} - {{ APP_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="h3"><i class="fas fa-edit"></i> Editar Usuario</h1>
+            <p class="text-muted">{{ usuario.email }}</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <form method="POST" novalidate>
+                        {{ form.hidden_tag() }}
+
+                        <div class="mb-3">
+                            <label class="form-label">{{ form.nombre.label.text }}</label>
+                            {{ form.nombre(class="form-control") }}
+                            {% if form.nombre.errors %}
+                                <div class="text-danger mt-1">
+                                    {% for error in form.nombre.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Correo Electrónico</label>
+                            <input type="text" class="form-control" value="{{ usuario.email }}" readonly>
+                            <small class="text-muted">El correo electrónico no puede modificarse</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">{{ form.rol.label.text }}</label>
+                            {{ form.rol(class="form-select") }}
+                            {% if form.rol.errors %}
+                                <div class="text-danger mt-1">
+                                    {% for error in form.rol.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">{{ form.activo.label.text }}</label>
+                            {{ form.activo(class="form-select") }}
+                            {% if form.activo.errors %}
+                                <div class="text-danger mt-1">
+                                    {% for error in form.activo.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        {{ form.enviar(class="btn btn-primary") }}
+                        <a href="{{ url_for('users.ver', usuario_id=usuario.id) }}" class="btn btn-outline-secondary">Cancelar</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

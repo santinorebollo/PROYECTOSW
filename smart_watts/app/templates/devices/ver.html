@@ -1,0 +1,200 @@
+{# =============================================== #}
+{# app/templates/devices/ver.html #}
+{# =============================================== #}
+{# Página de Detalle de Dispositivo #}
+{# =============================================== #}
+
+{% extends "base.html" %}
+
+{% block title %}{{ dispositivo.nombre }} - {{ APP_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="h3"><i class="fas fa-microchip"></i> {{ dispositivo.nombre }}</h1>
+            <p class="text-muted">{{ dispositivo.ubicacion or 'Sin ubicación especificada' }}</p>
+        </div>
+        <div class="col-md-4 text-end">
+            {% if current_user.es_admin() or dispositivo.usuario_id == current_user.id %}
+                <a href="{{ url_for('devices.editar', dispositivo_id=dispositivo.id) }}" class="btn btn-outline-warning">
+                    <i class="fas fa-edit"></i> Editar
+                </a>
+            {% endif %}
+            {% if current_user.es_admin() %}
+                <button onclick="confirmarEliminar({{ dispositivo.id }})" class="btn btn-outline-danger">
+                    <i class="fas fa-trash"></i> Eliminar
+                </button>
+            {% endif %}
+            <a href="{{ url_for('devices.listado') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left"></i> Volver
+            </a>
+        </div>
+    </div>
+
+    {# ==================== TARJETAS DE ESTADO ==================== #}
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <p class="text-muted mb-1">Estado</p>
+                    <h4 class="mb-0">
+                        <span class="badge bg-{% if estado_conexion == 'activo' %}success{% elif estado_conexion == 'inactivo' %}warning{% else %}danger{% endif %}">
+                            {{ estado_conexion.capitalize() }}
+                        </span>
+                    </h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <p class="text-muted mb-1">Potencia Actual</p>
+                    <h4 class="mb-0">
+                        {% if ultima_lectura %}{{ ultima_lectura.potencia }} W{% else %}-{% endif %}
+                    </h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <p class="text-muted mb-1">Consumo Total</p>
+                    <h4 class="mb-0">{{ consumo_total | round(2) }} kWh</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <p class="text-muted mb-1">Última Conexión</p>
+                    <h6 class="mb-0">
+                        {% if dispositivo.ultima_conexion %}
+                            {{ dispositivo.ultima_conexion.strftime('%d/%m/%Y %H:%M') }}
+                        {% else %}
+                            <span class="text-muted">Sin conexión</span>
+                        {% endif %}
+                    </h6>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        {# ==================== INFORMACIÓN DEL DISPOSITIVO ==================== #}
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-light">
+                    <h5 class="card-title mb-0">Información</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm mb-0">
+                        <tbody>
+                            <tr>
+                                <th>Nombre</th>
+                                <td>{{ dispositivo.nombre }}</td>
+                            </tr>
+                            <tr>
+                                <th>Ubicación</th>
+                                <td>{{ dispositivo.ubicacion or '-' }}</td>
+                            </tr>
+                            <tr>
+                                <th>Firmware</th>
+                                <td>{{ dispositivo.firmware }}</td>
+                            </tr>
+                            <tr>
+                                <th>Propietario</th>
+                                <td>{{ dispositivo.usuario.nombre }}</td>
+                            </tr>
+                            <tr>
+                                <th>Registrado</th>
+                                <td>{{ dispositivo.fecha_registro.strftime('%d/%m/%Y') }}</td>
+                            </tr>
+                            <tr>
+                                <th>Token API</th>
+                                <td><code class="small">{{ dispositivo.token_api[:16] }}...</code></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            {# ==================== ESTADÍSTICAS DE POTENCIA ==================== #}
+            <div class="card border-0 shadow-sm mt-4">
+                <div class="card-header bg-light">
+                    <h5 class="card-title mb-0">Estadísticas de Potencia</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Promedio</span>
+                        <strong>{{ potencia_promedio }} W</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Máxima</span>
+                        <strong class="text-danger">{{ potencia_maxima }} W</strong>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span>Mínima</span>
+                        <strong class="text-success">{{ potencia_minima }} W</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {# ==================== LECTURAS RECIENTES ==================== #}
+        <div class="col-md-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-light">
+                    <h5 class="card-title mb-0">Lecturas Recientes</h5>
+                </div>
+                <div class="card-body">
+                    {% if lecturas_recientes %}
+                        <div class="table-responsive">
+                            <table class="table table-hover table-sm mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Fecha/Hora</th>
+                                        <th>Voltaje</th>
+                                        <th>Corriente</th>
+                                        <th>Potencia</th>
+                                        <th>Consumo</th>
+                                        <th>F.P.</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for lectura in lecturas_recientes %}
+                                        <tr>
+                                            <td class="text-muted">{{ lectura.fecha_hora.strftime('%d/%m/%Y %H:%M:%S') }}</td>
+                                            <td>{{ lectura.voltaje }} V</td>
+                                            <td>{{ lectura.corriente }} A</td>
+                                            <td>{{ lectura.potencia }} W</td>
+                                            <td>{{ lectura.consumo }} kWh</td>
+                                            <td>{{ lectura.factor_potencia }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted mb-0">Este dispositivo aún no ha enviado lecturas</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if current_user.es_admin() %}
+<script>
+function confirmarEliminar(dispositivoId) {
+    if (confirm('¿Estás seguro de que deseas eliminar este dispositivo?')) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `/dispositivos/${dispositivoId}/eliminar`;
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+</script>
+{% endif %}
+{% endblock %}

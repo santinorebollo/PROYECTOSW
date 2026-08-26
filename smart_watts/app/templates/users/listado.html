@@ -1,0 +1,182 @@
+{# =============================================== #}
+{# app/templates/users/listado.html #}
+{# =============================================== #}
+{# Página de Listado de Usuarios #}
+{# =============================================== #}
+
+{% extends "base.html" %}
+
+{% block title %}Usuarios - {{ APP_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <h1 class="h3"><i class="fas fa-users"></i> Usuarios</h1>
+        </div>
+        <div class="col-md-6 text-end">
+            <a href="{{ url_for('users.crear') }}" class="btn btn-primary">
+                <i class="fas fa-user-plus"></i> Nuevo Usuario
+            </a>
+        </div>
+    </div>
+
+    {# Barra de búsqueda #}
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <form method="GET" class="row g-3">
+                <div class="col-md-6">
+                    <input type="text" name="buscar" class="form-control"
+                           placeholder="Buscar por nombre o email..." value="{{ buscar }}">
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-outline-primary w-100">
+                        <i class="fas fa-search"></i> Buscar
+                    </button>
+                </div>
+                {% if buscar %}
+                    <div class="col-md-3">
+                        <a href="{{ url_for('users.listado') }}" class="btn btn-outline-secondary w-100">
+                            <i class="fas fa-times"></i> Limpiar
+                        </a>
+                    </div>
+                {% endif %}
+            </form>
+        </div>
+    </div>
+
+    {# Tabla de usuarios #}
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+            {% if usuarios %}
+                <div class="table-responsive">
+                    <table class="table table-hover table-sortable mb-0">
+                        <thead>
+                            <tr>
+                                <th data-sort>Nombre</th>
+                                <th data-sort>Email</th>
+                                <th data-sort>Rol</th>
+                                <th data-sort>Estado</th>
+                                <th data-sort>Último Login</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for usuario in usuarios %}
+                                <tr>
+                                    <td>
+                                        <i class="fas fa-user"></i>
+                                        <strong>{{ usuario.nombre }}</strong>
+                                    </td>
+                                    <td>{{ usuario.email }}</td>
+                                    <td>
+                                        <span class="badge bg-{% if usuario.rol == 'admin' %}primary{% else %}secondary{% endif %}">
+                                            {{ 'Administrador' if usuario.rol == 'admin' else 'Usuario' }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-{% if usuario.activo %}success{% else %}danger{% endif %}">
+                                            {{ 'Activo' if usuario.activo else 'Inactivo' }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if usuario.ultima_login %}
+                                            <small class="text-muted">{{ usuario.ultima_login.strftime('%d/%m/%Y %H:%M') }}</small>
+                                        {% else %}
+                                            <small class="text-muted">Nunca</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{{ url_for('users.ver', usuario_id=usuario.id) }}"
+                                           class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{{ url_for('users.editar', usuario_id=usuario.id) }}"
+                                           class="btn btn-sm btn-outline-warning">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        {% if usuario.id != current_user.id %}
+                                            {% if usuario.activo %}
+                                                <button onclick="confirmarAccion({{ usuario.id }}, 'desactivar', '¿Desactivar a {{ usuario.nombre }}?')"
+                                                        class="btn btn-sm btn-outline-secondary">
+                                                    <i class="fas fa-user-slash"></i>
+                                                </button>
+                                            {% else %}
+                                                <button onclick="confirmarAccion({{ usuario.id }}, 'activar', '¿Activar a {{ usuario.nombre }}?')"
+                                                        class="btn btn-sm btn-outline-success">
+                                                    <i class="fas fa-user-check"></i>
+                                                </button>
+                                            {% endif %}
+                                            <button onclick="confirmarAccion({{ usuario.id }}, 'eliminar', '¿Eliminar permanentemente a {{ usuario.nombre }}? Esta acción no se puede deshacer.')"
+                                                    class="btn btn-sm btn-outline-danger">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                {# Paginación #}
+                {% if paginacion.pages > 1 %}
+                    <nav aria-label="Page navigation" class="mt-4">
+                        <ul class="pagination">
+                            <li class="page-item {% if not paginacion.has_prev %}disabled{% endif %}">
+                                <a class="page-link"
+                                   href="{{ url_for('users.listado', pagina=1, buscar=buscar) }}">
+                                    Primera
+                                </a>
+                            </li>
+
+                            {% for page_num in paginacion.iter_pages() %}
+                                {% if page_num %}
+                                    {% if page_num == paginacion.page %}
+                                        <li class="page-item active">
+                                            <span class="page-link">{{ page_num }}</span>
+                                        </li>
+                                    {% else %}
+                                        <li class="page-item">
+                                            <a class="page-link"
+                                               href="{{ url_for('users.listado', pagina=page_num, buscar=buscar) }}">
+                                                {{ page_num }}
+                                            </a>
+                                        </li>
+                                    {% endif %}
+                                {% else %}
+                                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                                {% endif %}
+                            {% endfor %}
+
+                            <li class="page-item {% if not paginacion.has_next %}disabled{% endif %}">
+                                <a class="page-link"
+                                   href="{{ url_for('users.listado', pagina=paginacion.pages, buscar=buscar) }}">
+                                    Última
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                {% endif %}
+            {% else %}
+                <div class="alert alert-info" role="alert">
+                    <i class="fas fa-info-circle"></i>
+                    No se encontraron usuarios
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+function confirmarAccion(usuarioId, accion, mensaje) {
+    if (confirm(mensaje)) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `/usuarios/${usuarioId}/${accion}`;
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+</script>
+{% endblock %}

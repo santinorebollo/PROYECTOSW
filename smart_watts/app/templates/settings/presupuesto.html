@@ -1,0 +1,92 @@
+{# =============================================== #}
+{# app/templates/settings/presupuesto.html #}
+{# =============================================== #}
+{# Página de Configuración de Presupuesto #}
+{# =============================================== #}
+
+{% extends "base.html" %}
+
+{% block title %}Presupuesto - {{ APP_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="h3"><i class="fas fa-wallet"></i> Presupuesto Mensual</h1>
+            <p class="text-muted">Configura y monitorea tu presupuesto de consumo energético</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="card-title mb-0">Configurar Presupuesto</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" novalidate>
+                        {{ form.hidden_tag() }}
+
+                        <div class="mb-3">
+                            <label class="form-label">{{ form.presupuesto_mensual.label.text }}</label>
+                            {{ form.presupuesto_mensual(class="form-control") }}
+                            {% if form.presupuesto_mensual.errors %}
+                                <div class="text-danger mt-1">
+                                    {% for error in form.presupuesto_mensual.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        {{ form.enviar(class="btn btn-primary") }}
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="card-title mb-0">Seguimiento del Mes Actual</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span>Gasto Actual</span>
+                        <strong>${{ "%.2f"|format(gasto_actual) }}</strong>
+                    </div>
+                    <div class="progress mb-2" style="height: 25px;">
+                        <div class="progress-bar {% if porcentaje >= 100 %}bg-danger{% elif porcentaje >= 85 %}bg-warning{% else %}bg-success{% endif %}"
+                             role="progressbar"
+                             style="width: {{ [porcentaje, 100] | min }}%;"
+                             aria-valuenow="{{ porcentaje }}" aria-valuemin="0" aria-valuemax="100">
+                            {{ porcentaje }}%
+                        </div>
+                    </div>
+
+                    {% if porcentaje >= 100 %}
+                        <div class="alert alert-danger" role="alert">
+                            <i class="fas fa-exclamation-circle"></i>
+                            Has superado tu presupuesto mensual
+                        </div>
+                    {% elif porcentaje >= 85 %}
+                        <div class="alert alert-warning" role="alert">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            Estás cerca de alcanzar tu presupuesto mensual
+                        </div>
+                    {% elif porcentaje >= 70 %}
+                        <div class="alert alert-info" role="alert">
+                            <i class="fas fa-info-circle"></i>
+                            Has utilizado más del 70% de tu presupuesto
+                        </div>
+                    {% endif %}
+
+                    <a href="{{ url_for('reports.mensual') }}" class="btn btn-outline-primary">
+                        <i class="fas fa-chart-bar"></i> Ver Reporte Mensual
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

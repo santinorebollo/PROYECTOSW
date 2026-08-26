@@ -1,0 +1,164 @@
+# ===============================================
+# Estructura de Directorios de Smart Watts
+# ===============================================
+# 
+# Este archivo documenta la estructura completa
+# del proyecto y los directorios que deben existir
+#
+# Para crear todos los directorios automáticamente,
+# ejecutar: python setup_structure.py
+# ===============================================
+
+# smart_watts/
+#
+# Directorio raíz del proyecto
+
+# smart_watts/app/
+# Paquete principal de la aplicación Flask
+
+# smart_watts/app/models/
+# Modelos de base de datos
+# - __init__.py (ya creado)
+# - user.py (ya creado)
+# - device.py (ya creado)
+# - reading.py (ya creado)
+# - notification.py (ya creado)
+# - energy_rate.py (ya creado)
+
+# smart_watts/app/routes/
+# Blueprints/Rutas de la aplicación
+# - __init__.py (ya creado)
+# - auth.py (ya creado)
+# - dashboard.py (ya creado)
+# - devices.py (ya creado)
+# - users.py (ya creado)
+# - notifications.py (ya creado)
+# - api.py (ya creado)
+# - reports.py (ya creado)
+
+# smart_watts/app/forms/
+# Formularios con validación
+# - __init__.py (ya creado)
+# - auth_forms.py (ya creado)
+# - device_forms.py (ya creado)
+
+# smart_watts/app/static/
+# Archivos estáticos (CSS, JS, imágenes)
+
+# smart_watts/app/static/css/
+# Hojas de estilos
+# - style.css (ya creado)
+
+# smart_watts/app/static/js/
+# Archivos JavaScript
+# - main.js (ya creado)
+
+# smart_watts/app/static/img/
+# Imágenes y activos
+# - logo.png (NO CREADO - Agregar manualmente)
+
+# smart_watts/app/templates/
+# Templates HTML
+
+# smart_watts/app/templates/auth/
+# Templates de autenticación
+# - login.html (ya creado)
+# - registro.html (ya creado)
+# - cambiar_contraseña.html (NO CREADO)
+# - recuperar_contraseña.html (NO CREADO)
+
+# smart_watts/app/templates/dashboard/
+# Templates del dashboard
+# - index.html (ya creado)
+
+# smart_watts/app/templates/devices/
+# Templates de dispositivos
+# - listado.html (ya creado)
+# - crear.html (NO CREADO)
+# - ver.html (NO CREADO)
+# - editar.html (NO CREADO)
+
+# smart_watts/app/templates/users/
+# Templates de usuarios
+# - listado.html (NO CREADO)
+# - crear.html (NO CREADO)
+# - ver.html (NO CREADO)
+# - editar.html (NO CREADO)
+
+# smart_watts/app/templates/notifications/
+# Templates de notificaciones
+# - listado.html (NO CREADO)
+
+# smart_watts/app/templates/reports/
+# Templates de reportes
+# - listado.html (NO CREADO)
+# - diario.html (NO CREADO)
+# - semanal.html (NO CREADO)
+# - mensual.html (NO CREADO)
+
+# smart_watts/app/templates/settings/
+# Templates de configuración
+# - perfil.html (NO CREADO)
+# - presupuesto.html (NO CREADO)
+# - tarifas.html (NO CREADO)
+
+# smart_watts/database/
+# Base de datos
+# - smart_watts.db (Se crea automáticamente)
+
+# smart_watts/logs/
+# Archivos de log
+# - smart_watts.log (Se crea automáticamente)
+
+# smart_watts/
+# Archivos en raíz
+# - __init__.py (app/__init__.py creado)
+# - config.py (ya creado)
+# - run.py (ya creado)
+# - requirements.txt (ya creado)
+# - README.md (ya creado)
+# - INSTALL.md (ya creado)
+# - API_DEVICES.md (ya creado)
+# - .env.example (ya creado)
+# - .gitignore (ya creado)
+# - .env (Crear manualmente)
+
+print("""
+✓ Estructura de Smart Watts generada
+
+Directorios creados automáticamente:
+├── app/
+│   ├── models/
+│   ├── routes/
+│   ├── forms/
+│   ├── static/
+│   │   ├── css/
+│   │   ├── js/
+│   │   └── img/
+│   └── templates/
+│       ├── auth/
+│       ├── dashboard/
+│       ├── devices/
+│       ├── users/
+│       ├── notifications/
+│       ├── reports/
+│       └── settings/
+└── database/
+
+Archivos creados:
+✓ Modelos de BD (6 archivos)
+✓ Rutas/Blueprints (8 archivos)
+✓ Formularios (2 archivos)
+✓ Templates HTML (3+ archivos)
+✓ CSS y JS (2 archivos)
+✓ Configuración y utilidades (6 archivos)
+
+Para usar Smart Watts:
+1. pip install -r requirements.txt
+2. python run.py
+3. Abrir http://localhost:5000
+
+Credenciales de prueba:
+- Admin: admin@smartwatts.local / admin123
+- Usuario: usuario@smartwatts.local / usuario123
+""")

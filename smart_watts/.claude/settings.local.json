@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(.\\\\venv\\\\Scripts\\\\python.exe -c \"from app import create_app, db; app = create_app\\('testing'\\); print\\('APP CREATED OK'\\); print\\(app.url_map\\)\")",
+      "PowerShell(.\\\\venv\\\\Scripts\\\\python.exe _audit_test.py)",
+      "PowerShell(.\\\\venv\\\\Scripts\\\\python.exe -c \"import email_validator; print\\(email_validator.__version__\\); from email_validator import validate_email; print\\(validate_email\\('admin@smartwatts.local', check_deliverability=False\\)\\)\")",
+      "PowerShell(.\\\\venv\\\\Scripts\\\\python.exe -m pip show email-validator wtforms)",
+      "PowerShell(.\\\\venv\\\\Scripts\\\\python.exe _audit_test.py 2>&1)",
+      "PowerShell(Remove-Item -Path \"_audit_test.py\" -Force -Confirm:$false)",
+      "PowerShell(.\\\\venv\\\\Scripts\\\\python.exe -c \"from app import create_app; app = create_app\\('development'\\); print\\('App creada OK'\\); print\\('Total rutas:', len\\(list\\(app.url_map.iter_rules\\(\\)\\)\\)\\)\")",
+      "PowerShell(python _audit_test_phase2.py)",
+      "PowerShell(python -c \"from app import create_app; app = create_app\\('development'\\); print\\('APP OK'\\); print\\([str\\(r\\) for r in app.url_map.iter_rules\\(\\)][:5]\\); print\\('Total rutas:', len\\(list\\(app.url_map.iter_rules\\(\\)\\)\\)\\)\")",
+      "PowerShell(python -m compileall -q app run.py config.py; echo \"EXIT CODE: $LASTEXITCODE\")",
+      "PowerShell(python _audit_phase3.py)"
+    ]
+  }
+}

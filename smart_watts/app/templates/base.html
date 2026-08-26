@@ -1,0 +1,311 @@
+{# =============================================== #}
+{# app/templates/base.html #}
+{# =============================================== #}
+{# Template Base para toda la aplicación #}
+{# #}
+{# Proporciona: #}
+{# - Sidebar oscuro con navegación agrupada #}
+{# - Topbar con saludo, notificaciones y menú de usuario #}
+{# - Area de contenido principal #}
+{# - Footer #}
+{# - Estilos CSS comunes #}
+{# - Scripts JavaScript comunes #}
+{# =============================================== #}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ APP_NAME }}{% endblock %}</title>
+
+    {# ==================== CSS ==================== #}
+
+    {# Bootstrap 5 #}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    {# Font Awesome para iconos #}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    {# CSS personalizado #}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    {# Favicon #}
+    <link rel="icon" href="{{ url_for('static', filename='img/logo.png') }}">
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <div class="app-wrapper">
+        {# ==================== SIDEBAR ==================== #}
+
+        <nav class="sidebar" id="sidebar">
+            {# Logo / Marca #}
+            <div class="sidebar-header">
+                <a href="{{ url_for('dashboard.index') }}" class="sidebar-brand">
+                    <span class="sidebar-logo-badge">
+                        <img src="{{ url_for('static', filename='img/logo.png') }}" alt="{{ APP_NAME }}">
+                    </span>
+                    <span class="sidebar-brand-text">
+                        <span class="brand-name">{{ APP_NAME }}</span>
+                        <span class="brand-tagline">Energy Management</span>
+                    </span>
+                </a>
+            </div>
+
+            <div class="sidebar-body">
+                {% if current_user.is_authenticated %}
+                    {# ---------- Sección Principal ---------- #}
+                    <div class="sidebar-section">
+                        <p class="sidebar-section-title">Principal</p>
+                        <ul class="nav flex-column">
+                            <li class="nav-item">
+                                <a class="nav-link {% if request.endpoint == 'dashboard.index' %}active{% endif %}"
+                                   href="{{ url_for('dashboard.index') }}">
+                                    <i class="fas fa-chart-line nav-icon"></i>
+                                    <span class="nav-label">Dashboard</span>
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link {% if request.endpoint and 'devices' in request.endpoint %}active{% endif %}"
+                                   href="{{ url_for('devices.listado') }}">
+                                    <i class="fas fa-plug nav-icon"></i>
+                                    <span class="nav-label">Dispositivos</span>
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link {% if request.endpoint and 'reports' in request.endpoint %}active{% endif %}"
+                                   href="{{ url_for('reports.listado') }}">
+                                    <i class="fas fa-file-alt nav-icon"></i>
+                                    <span class="nav-label">Reportes</span>
+                                </a>
+                            </li>
+
+                            {% if current_user.es_admin() %}
+                                <li class="nav-item">
+                                    <a class="nav-link {% if request.endpoint and 'users' in request.endpoint %}active{% endif %}"
+                                       href="{{ url_for('users.listado') }}">
+                                        <i class="fas fa-users nav-icon"></i>
+                                        <span class="nav-label">Usuarios</span>
+                                    </a>
+                                </li>
+                            {% endif %}
+
+                            {% set no_leidas_sidebar = current_user.notificaciones.filter_by(leida=False).count() %}
+                            <li class="nav-item">
+                                <a class="nav-link {% if request.endpoint and 'notifications' in request.endpoint %}active{% endif %}"
+                                   href="{{ url_for('notifications.listado') }}">
+                                    <i class="fas fa-bell nav-icon"></i>
+                                    <span class="nav-label">Notificaciones</span>
+                                    {% if no_leidas_sidebar > 0 %}
+                                        <span class="badge bg-danger">{{ no_leidas_sidebar }}</span>
+                                    {% endif %}
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    {# ---------- Sección Configuración ---------- #}
+                    <div class="sidebar-section">
+                        <p class="sidebar-section-title">Configuración</p>
+                        <ul class="nav flex-column">
+                            {% if current_user.es_admin() %}
+                                <li class="nav-item">
+                                    <a class="nav-link {% if request.endpoint and 'settings.tarifas' in request.endpoint %}active{% endif %}"
+                                       href="{{ url_for('settings.tarifas') }}">
+                                        <i class="fas fa-cog nav-icon"></i>
+                                        <span class="nav-label">Tarifas</span>
+                                    </a>
+                                </li>
+                            {% endif %}
+
+                            <li class="nav-item">
+                                <a class="nav-link {% if request.endpoint and 'settings.presupuesto' in request.endpoint %}active{% endif %}"
+                                   href="{{ url_for('settings.presupuesto') }}">
+                                    <i class="fas fa-wallet nav-icon"></i>
+                                    <span class="nav-label">Presupuesto</span>
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link {% if request.endpoint and 'settings.perfil' in request.endpoint %}active{% endif %}"
+                                   href="{{ url_for('settings.perfil') }}">
+                                    <i class="fas fa-user nav-icon"></i>
+                                    <span class="nav-label">Perfil</span>
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link {% if request.endpoint == 'auth.cambiar_contraseña' %}active{% endif %}"
+                                   href="{{ url_for('auth.cambiar_contraseña') }}">
+                                    <i class="fas fa-key nav-icon"></i>
+                                    <span class="nav-label">Contraseña</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                {% endif %}
+            </div>
+
+            {% if current_user.is_authenticated %}
+                <div class="sidebar-footer">
+                    <a class="sidebar-logout" href="{{ url_for('auth.logout') }}">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Cerrar Sesión</span>
+                    </a>
+                </div>
+            {% endif %}
+        </nav>
+
+        {# Overlay para cerrar el sidebar en móvil #}
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+        {# ==================== CONTENIDO PRINCIPAL ==================== #}
+
+        <main class="main-content">
+            {# ---------- Topbar ---------- #}
+            <header class="topbar">
+                <div class="topbar-left">
+                    <button class="btn-icon d-lg-none" id="sidebarToggle" type="button" aria-label="Abrir menú">
+                        <i class="fas fa-bars"></i>
+                    </button>
+
+                    {% if current_user.is_authenticated %}
+                        <div class="topbar-greeting d-none d-md-block">
+                            <h6>Hola, {{ current_user.nombre.split(' ')[0] }} 👋</h6>
+                            <small id="topbar-date"></small>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="topbar-right">
+                    {% if current_user.is_authenticated %}
+                        {% set no_leidas = current_user.notificaciones.filter_by(leida=False).count() %}
+                        {% set notifs_recientes = (current_user.notificaciones.filter_by(leida=False).all() | reverse | list)[:5] %}
+
+                        {# ---------- Notificaciones ---------- #}
+                        <div class="dropdown">
+                            <button class="btn-icon position-relative"
+                                    type="button"
+                                    id="dropdownNotificaciones"
+                                    data-bs-toggle="dropdown"
+                                    aria-expanded="false"
+                                    aria-label="Notificaciones">
+                                <i class="fas fa-bell"></i>
+                                <span class="notif-dot" id="notificacion-badge" style="{% if no_leidas == 0 %}display: none;{% endif %}"></span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end notif-dropdown" aria-labelledby="dropdownNotificaciones" id="notificacionesLista">
+                                <li class="dropdown-header">Notificaciones {% if no_leidas > 0 %}({{ no_leidas }} sin leer){% endif %}</li>
+                                {% for notificacion in notifs_recientes %}
+                                    <li>
+                                        <a class="dropdown-item notif-item" href="{{ url_for('notifications.listado') }}">
+                                            <span class="notif-icon">
+                                                {% if notificacion.tipo == 'consumo' %}
+                                                    <i class="fas fa-bolt"></i>
+                                                {% elif notificacion.tipo == 'preventiva' %}
+                                                    <i class="fas fa-exclamation-triangle"></i>
+                                                {% elif notificacion.tipo == 'presupuesto' %}
+                                                    <i class="fas fa-wallet"></i>
+                                                {% elif notificacion.tipo == 'dispositivo' %}
+                                                    <i class="fas fa-microchip"></i>
+                                                {% else %}
+                                                    <i class="fas fa-info-circle"></i>
+                                                {% endif %}
+                                            </span>
+                                            <span>
+                                                <span class="notif-text d-block">{{ notificacion.mensaje }}</span>
+                                                <span class="notif-time">{{ notificacion.fecha.strftime('%d/%m %H:%M') }}</span>
+                                            </span>
+                                        </a>
+                                    </li>
+                                {% else %}
+                                    <li><span class="dropdown-item-text text-muted">Sin notificaciones nuevas</span></li>
+                                {% endfor %}
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item justify-content-center fw-semibold text-primary" href="{{ url_for('notifications.listado') }}">Ver todas</a></li>
+                            </ul>
+                        </div>
+
+                        {# ---------- Usuario ---------- #}
+                        {% set partes_nombre = current_user.nombre.split() %}
+                        {% set iniciales = (partes_nombre[0][0] ~ (partes_nombre[1][0] if partes_nombre|length > 1 else '')) | upper %}
+                        <div class="dropdown">
+                            <button class="user-menu-toggle"
+                                    type="button"
+                                    id="dropdownUsuario"
+                                    data-bs-toggle="dropdown"
+                                    aria-expanded="false">
+                                <span class="user-avatar">{{ iniciales }}</span>
+                                <span class="user-info d-none d-md-flex">
+                                    <span class="user-name">{{ current_user.nombre }}</span>
+                                    <span class="user-role">{{ 'Administrador' if current_user.es_admin() else 'Usuario' }}</span>
+                                </span>
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownUsuario">
+                                <li class="dropdown-header">Mi Cuenta</li>
+                                <li><a class="dropdown-item" href="{{ url_for('settings.perfil') }}"><i class="fas fa-user"></i> Mi Perfil</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('auth.cambiar_contraseña') }}"><i class="fas fa-key"></i> Cambiar Contraseña</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-danger" href="{{ url_for('auth.logout') }}"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a></li>
+                            </ul>
+                        </div>
+                    {% endif %}
+                </div>
+            </header>
+
+            {# ---------- Contenido ---------- #}
+            <div class="content-area">
+                {# Mensajes Flash #}
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{% if category == 'danger' %}danger{% elif category == 'success' %}success{% elif category == 'warning' %}warning{% else %}info{% endif %} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                {# Bloque de contenido específico de la página #}
+                {% block content %}{% endblock %}
+            </div>
+
+            {# ---------- Footer ---------- #}
+            <footer class="app-footer">
+                <div class="container-fluid text-center">
+                    {{ APP_NAME }} v{{ APP_VERSION }} &middot; &copy; 2026 Todos los derechos reservados
+                </div>
+            </footer>
+        </main>
+    </div>
+
+    {# ==================== SCRIPTS ==================== #}
+
+    {# Bootstrap 5 #}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    {# Chart.js para gráficos #}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.5.1/chart.min.js"></script>
+
+    {# Socket.IO para tiempo real #}
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+
+    {# JavaScript personalizado #}
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+    {% block extra_js %}{% endblock %}
+
+    <script>
+        // Inicializar WebSockets si estamos autenticado
+        // (los listeners 'nueva_notificacion' / 'datos_actualizados' se
+        // registran en SmartWatts.setupWebSockets() dentro de main.js)
+        {% if current_user.is_authenticated %}
+            const socket = io();
+        {% endif %}
+    </script>
+</body>
+</html>

@@ -1,0 +1,91 @@
+{# =============================================== #}
+{# app/templates/reports/listado.html #}
+{# =============================================== #}
+{# Página Principal de Reportes #}
+{# =============================================== #}
+
+{% extends "base.html" %}
+
+{% block title %}Reportes - {{ APP_NAME }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="h3"><i class="fas fa-file-alt"></i> Reportes</h1>
+            <p class="text-muted">Consulta y exporta el consumo energético de tus dispositivos</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center d-flex flex-column">
+                    <div class="mb-3">
+                        <i class="fas fa-calendar-day fa-3x text-primary"></i>
+                    </div>
+                    <h5 class="card-title">Reporte Diario</h5>
+                    <p class="card-text text-muted flex-grow-1">
+                        Consumo y costo del día de hoy, distribuido por hora.
+                    </p>
+                    <a href="{{ url_for('reports.diario') }}" class="btn btn-primary">
+                        <i class="fas fa-eye"></i> Ver Reporte
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center d-flex flex-column">
+                    <div class="mb-3">
+                        <i class="fas fa-calendar-week fa-3x text-success"></i>
+                    </div>
+                    <h5 class="card-title">Reporte Semanal</h5>
+                    <p class="card-text text-muted flex-grow-1">
+                        Evolución del consumo durante los últimos 7 días.
+                    </p>
+                    <a href="{{ url_for('reports.semanal') }}" class="btn btn-success">
+                        <i class="fas fa-eye"></i> Ver Reporte
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center d-flex flex-column">
+                    <div class="mb-3">
+                        <i class="fas fa-calendar-alt fa-3x text-warning"></i>
+                    </div>
+                    <h5 class="card-title">Reporte Mensual</h5>
+                    <p class="card-text text-muted flex-grow-1">
+                        Consumo del mes, comparativa con presupuesto y top de dispositivos.
+                    </p>
+                    <a href="{{ url_for('reports.mensual') }}" class="btn btn-warning">
+                        <i class="fas fa-eye"></i> Ver Reporte
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-light">
+            <h5 class="card-title mb-0"><i class="fas fa-file-export"></i> Exportar Datos</h5>
+        </div>
+        <div class="card-body">
+            <p class="text-muted">Descarga las lecturas de consumo de tus dispositivos en formato CSV.</p>
+            <a href="{{ url_for('reports.exportar', tipo='diario') }}" class="btn btn-outline-primary">
+                <i class="fas fa-download"></i> Exportar Diario (CSV)
+            </a>
+            <a href="{{ url_for('reports.exportar', tipo='semanal') }}" class="btn btn-outline-success">
+                <i class="fas fa-download"></i> Exportar Semanal (CSV)
+            </a>
+            <a href="{{ url_for('reports.exportar', tipo='mensual') }}" class="btn btn-outline-warning">
+                <i class="fas fa-download"></i> Exportar Mensual (CSV)
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

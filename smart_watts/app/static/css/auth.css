@@ -1,0 +1,370 @@
+/* ===============================================
+   app/static/css/auth.css
+   ===============================================
+   Estilos para las páginas de autenticación
+   (Login, Registro, Recuperar Contraseña).
+   Diseño tipo "split-screen" SaaS: panel de marca
+   oscuro a la izquierda + formulario a la derecha.
+   =============================================== */
+
+:root {
+    --color-primary: #0F172A;
+    --color-secondary: #111827;
+    --color-accent: #3B82F6;
+    --color-accent-hover: #2563EB;
+    --color-accent-soft: rgba(59, 130, 246, 0.12);
+    --color-success: #10B981;
+    --color-warning: #F59E0B;
+    --color-danger: #EF4444;
+    --color-danger-soft: rgba(239, 68, 68, 0.12);
+    --color-bg: #F8FAFC;
+    --color-surface: #FFFFFF;
+    --color-text: #1E293B;
+    --color-text-muted: #64748B;
+    --color-border: #E2E8F0;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100%;
+}
+
+body.auth-body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Inter', Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--color-bg);
+    color: var(--color-text);
+}
+
+.auth-wrapper {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* ============ PANEL DE MARCA (izquierda) ============ */
+.auth-brand {
+    flex: 1;
+    background: linear-gradient(155deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 60px 64px;
+    position: relative;
+    overflow: hidden;
+}
+
+.auth-brand::before,
+.auth-brand::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.auth-brand::before {
+    width: 480px;
+    height: 480px;
+    background: radial-gradient(circle, rgba(59, 130, 246, 0.18) 0%, transparent 70%);
+    top: -160px;
+    right: -160px;
+}
+
+.auth-brand::after {
+    width: 360px;
+    height: 360px;
+    background: radial-gradient(circle, rgba(59, 130, 246, 0.12) 0%, transparent 70%);
+    bottom: -120px;
+    left: -100px;
+}
+
+.auth-brand-content {
+    position: relative;
+    z-index: 1;
+    max-width: 460px;
+}
+
+.auth-logo-badge {
+    width: 64px;
+    height: 64px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 32px;
+}
+
+.auth-logo-badge img {
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+}
+
+.auth-brand h1 {
+    font-size: 32px;
+    font-weight: 800;
+    margin: 0 0 12px;
+    letter-spacing: -0.01em;
+}
+
+.auth-brand p.tagline {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 15px;
+    line-height: 1.7;
+    margin-bottom: 44px;
+}
+
+.auth-feature-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.auth-feature-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    font-size: 14px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.85);
+    line-height: 1.4;
+    padding-top: 6px;
+}
+
+.auth-feature-list .icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 11px;
+    background: rgba(59, 130, 246, 0.16);
+    color: #60A5FA;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 15px;
+}
+
+/* ============ PANEL DE FORMULARIO (derecha) ============ */
+.auth-form-side {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 24px;
+    background: var(--color-bg);
+}
+
+.auth-form-card {
+    width: 100%;
+    max-width: 420px;
+}
+
+.auth-form-mobile-logo {
+    display: none;
+    text-align: center;
+    margin-bottom: 28px;
+}
+
+.auth-form-mobile-logo .badge-dark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    background: var(--color-primary);
+}
+
+.auth-form-mobile-logo .badge-dark img {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+}
+
+.auth-form-card h2 {
+    font-size: 25px;
+    font-weight: 800;
+    margin-bottom: 6px;
+    letter-spacing: -0.01em;
+}
+
+.auth-form-card .subtitle {
+    color: var(--color-text-muted);
+    font-size: 14px;
+    margin-bottom: 28px;
+}
+
+.auth-form-card .form-label {
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--color-text);
+    margin-bottom: 6px;
+    display: block;
+}
+
+.auth-form-card .form-control {
+    border: 1.5px solid var(--color-border);
+    border-radius: 10px;
+    padding: 0.7rem 1rem;
+    font-size: 14px;
+    color: var(--color-text);
+    background-color: var(--color-surface);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.auth-form-card .form-control:focus {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px var(--color-accent-soft);
+    outline: none;
+}
+
+.auth-form-card .input-group .form-control:focus {
+    box-shadow: none;
+}
+
+.auth-form-card .input-group:focus-within {
+    border-radius: 10px;
+    box-shadow: 0 0 0 3px var(--color-accent-soft);
+}
+
+.auth-form-card .input-group:focus-within .form-control,
+.auth-form-card .input-group:focus-within .input-group-text {
+    border-color: var(--color-accent);
+}
+
+.auth-form-card .input-group-text {
+    border: 1.5px solid var(--color-border);
+    background-color: var(--color-surface);
+    color: var(--color-text-muted);
+}
+
+.auth-form-card .input-group-text.password-toggle {
+    cursor: pointer;
+}
+
+.auth-form-card .form-check-input {
+    border: 1.5px solid var(--color-border);
+    width: 1.05em;
+    height: 1.05em;
+}
+
+.auth-form-card .form-check-input:checked {
+    background-color: var(--color-accent);
+    border-color: var(--color-accent);
+}
+
+.auth-form-card .form-check-label {
+    font-size: 13.5px;
+    color: var(--color-text-muted);
+}
+
+.auth-form-card .form-text-error {
+    color: var(--color-danger);
+    font-size: 12.5px;
+    margin-top: 6px;
+}
+
+.btn-auth {
+    width: 100%;
+    padding: 0.75rem;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 14.5px;
+    background-color: var(--color-accent);
+    border: none;
+    color: #fff;
+    transition: all 0.15s ease;
+    margin-top: 8px;
+}
+
+.btn-auth:hover {
+    background-color: var(--color-accent-hover);
+    color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
+}
+
+.auth-form-card .form-footer {
+    text-align: center;
+    margin-top: 26px;
+    font-size: 14px;
+    color: var(--color-text-muted);
+}
+
+.auth-form-card .form-footer a {
+    color: var(--color-accent);
+    text-decoration: none;
+    font-weight: 700;
+}
+
+.auth-form-card .form-footer a:hover {
+    text-decoration: underline;
+}
+
+.auth-divider {
+    text-align: center;
+    margin: 18px 0;
+    font-size: 12px;
+    color: var(--color-text-muted);
+}
+
+/* ============ ALERTAS ============ */
+.auth-form-card .alert {
+    border: none;
+    border-radius: 10px;
+    border-left: 4px solid transparent;
+    padding: 0.8rem 1rem;
+    font-size: 13.5px;
+    margin-bottom: 18px;
+}
+
+.auth-form-card .alert-success { background-color: rgba(16, 185, 129, 0.12); color: #047857; border-left-color: var(--color-success); }
+.auth-form-card .alert-danger { background-color: var(--color-danger-soft); color: #B91C1C; border-left-color: var(--color-danger); }
+.auth-form-card .alert-warning { background-color: rgba(245, 158, 11, 0.12); color: #B45309; border-left-color: var(--color-warning); }
+.auth-form-card .alert-info { background-color: var(--color-accent-soft); color: #1D4ED8; border-left-color: var(--color-accent); }
+
+/* ============ CAJA DE CREDENCIALES DEMO ============ */
+.auth-demo-box {
+    margin-top: 24px;
+    padding: 14px 16px;
+    border-radius: 10px;
+    background: var(--color-accent-soft);
+    border: 1px solid rgba(59, 130, 246, 0.18);
+    font-size: 12.5px;
+    color: var(--color-text);
+}
+
+.auth-demo-box strong {
+    color: var(--color-primary);
+}
+
+.auth-demo-box code {
+    background: rgba(255, 255, 255, 0.7);
+    padding: 1px 5px;
+    border-radius: 4px;
+    color: var(--color-primary);
+}
+
+/* ============ RESPONSIVE ============ */
+@media (max-width: 991.98px) {
+    .auth-brand {
+        display: none;
+    }
+
+    .auth-form-mobile-logo {
+        display: block;
+    }
+
+    .auth-form-side {
+        padding: 32px 20px;
+    }
+}
