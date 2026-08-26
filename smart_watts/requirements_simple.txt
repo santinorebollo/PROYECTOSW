@@ -18,3 +18,4 @@ MarkupSafe==2.1.1
 greenlet==3.0.0
 gunicorn
 eventlet
+psycopg2-binary==2.9.9
