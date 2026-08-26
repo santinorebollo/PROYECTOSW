@@ -159,7 +159,8 @@ if __name__ == '__main__':
     """)
     
     # Inicializar la aplicación
-    initialize_app()
+        if config_name == 'development':
+        initialize_app()
     
     # Obtener configuración
     config_name = os.environ.get('FLASK_ENV', 'development')
