@@ -133,14 +133,15 @@ class ProductionConfig(Config):
     DEBUG = False
     TESTING = False
     
-    # En producción, HTTPS obligatorio
+       # En producción, HTTPS obligatorio
     SESSION_COOKIE_SECURE = True
     
     # Base de datos: usar variable de entorno o SQLite como fallback
-       uri = os.environ.get('DATABASE_URL')
+    uri = os.environ.get('DATABASE_URL')
     if uri and uri.startswith("postgres://"):
         uri = uri.replace("postgres://", "postgresql://", 1)
-    SQLALCHEMY_DATABASE_URI = uri or 'sqlite:///' + os.path.join(os.path.dirname(__file__), 'database', 'smart_watts.db')
+    SQLALCHEMY_DATABASE_URI = uri or \
+        'sqlite:///' + os.path.join(os.path.dirname(__file__), 'database', 'smart_watts.db')
     
     # Clave secreta: usar variable de entorno o la del Config base
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'dev-secret-key-change-in-production'
